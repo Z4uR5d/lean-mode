@@ -6,18 +6,19 @@ This document is the canonical source of truth for agent roles, tool allocations
 
 ## 1. Orchestrator (`orchestrator`)
 
-- **Objective**: Scope classification (Task vs. Checkpoint vs. Epic), Checkpoint compilation, execution DAG planning strictly for the active Checkpoint, dynamic worker registration and dispatch, Proof Contract verification, and merge sign-off.
+- **Objective**: Maintain `/project-plan.md` as the persistent Single Source of Truth (SSOT), scope classification (Task vs. Checkpoint vs. Epic), Checkpoint compilation, execution DAG planning strictly for the active Checkpoint, dynamic worker registration and dispatch, Proof Contract verification, and merge sign-off.
 - **Orchestration Execution Contract**:
-  1. **Classify Scope**: Determine tier (Task vs. Checkpoint sequence vs. Epics) using the structural complexity matrix.
+  1. **Synchronize Project State**: Inspect `/project-plan.md` in the project root. If missing, create it. Read current status, completed log, and active focus.
+  2. **Classify Scope**: Determine tier (Task vs. Checkpoint sequence vs. Epics) using the structural complexity matrix. Record identified Epics in `/project-plan.md`.
      - *Task*: Execute directly as a single agent with a local Proof Contract.
      - *Epic*: Decompose into domain-bounded Epics; sequence or isolate active Epic.
-  2. **Compile Checkpoints**: For the active Epic or multi-step subsystem, compile atomic Checkpoints (`CP-01`, `CP-02`, ...).
-  3. **Select**: Identify the first incomplete Checkpoint.
-  4. **Triage Topology**: Apply the Pre-Flight Topology Gate (Single-Agent Monolith vs. Multi-Agent DAG).
-  5. **Plan Single-CP DAG**: Construct execution DAG *strictly for the active Checkpoint*. Never plan beyond the current Checkpoint.
-  6. **Dispatch**: Dynamically register and spawn pruned workers via `define_subagent`.
-  7. **Verify**: Await and validate the Proof Contract (`exit 0` required).
-  8. **Merge**: Mark Checkpoint complete, merge working baseline, record feedback memory, and proceed to the next Checkpoint.
+  3. **Compile Checkpoints**: For the active Epic or multi-step subsystem, compile atomic Checkpoints (`CP-01`, `CP-02`, ...) and record them in `/project-plan.md`.
+  4. **Set Focus**: Update `## Current Focus` in `/project-plan.md` with the active Epic, Checkpoint, and Task before executing.
+  5. **Triage Topology**: Apply the Pre-Flight Topology Gate (Single-Agent Monolith vs. Multi-Agent DAG).
+  6. **Plan Single-CP DAG**: Construct execution DAG *strictly for the active Checkpoint*. Never plan beyond the current Checkpoint.
+  7. **Dispatch**: Dynamically register and spawn pruned workers via `define_subagent`.
+  8. **Verify**: Await and validate the Proof Contract (`exit 0` required).
+  9. **Merge & Update State**: Mark Checkpoint complete (`[x]`), append to `## Completed Log` in `/project-plan.md`, merge working baseline, record feedback memory, and advance focus to the next Checkpoint.
 - **Allowed Tools**:
   - `send_message`: Dispatches instructions to workers and receives structured status reports.
   - `define_subagent`: Dynamically registers pruned implementer and verifier roles.
@@ -25,9 +26,12 @@ This document is the canonical source of truth for agent roles, tool allocations
   - `manage_subagents`: Monitors subagent lifecycle and terminates completed processes.
   - `run_command`: Strictly for pre-flight environment checks or invoking test runners at Checkpoint boundaries.
   - `view_file`: Read-only file inspection.
+  - `write_to_file`: Exclusively for creating or initializing `/project-plan.md` in the project root.
+  - `replace_file_content`: Exclusively for updating state, focus, and logs in `/project-plan.md`.
 - **Operational Boundaries**:
-  - Delegates all source code modifications to implementers; never calls `write_to_file` or `replace_file_content`.
+  - Maintains `/project-plan.md` as the single source of truth; delegates all source code modifications to implementers.
   - Context is strictly bounded to the active Checkpoint—never models future Checkpoints concurrently.
+  - Never infers project state from chat history when `/project-plan.md` exists.
 
 ---
 

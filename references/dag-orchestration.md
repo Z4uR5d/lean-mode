@@ -23,36 +23,44 @@ Traditional multi-agent frameworks attempt to plan an entire multi-phase project
 [ Request ]
     │
     ▼
-[ 1. Scope Classification ]
-    ├── Multiple Subsystems ──► [ Decompose into Epics ] ──┐
-    ├── Atomic Change (1 merge) ──► [ Execute Task directly (exit 0) ]
-    └── Subsystem with Increments ─────────────────────────┤
-                                                           ▼
-                                         [ 2. Compile Checkpoints: CP-01... ]
-                                                           │
-                                                           ▼
-                                      ┌──► [ 3. Select Next Incomplete CP ]
-                                      │                    │
-                                      │                    ▼
-                                      │           [ 4. Topology Gate ]
-                                      │              ├── <= 3 files / Sequential ──► [ Single-Agent Monolith ]
-                                      │              └── Concurrent / Review Gate ─► [ Local Multi-Agent DAG ]
-                                      │                    │                                   │
-                                      │                    └─────────────────┬─────────────────┘
-                                      │                                      ▼
-                                      │                         [ 5. Execute Implementation ]
-                                      │                                      │
-                                      │                                      ▼
-                                      │                         [ 6. Enforce Proof Contract ]
-                                      │                                      │
-                                      │                        Passes? ──────┴────── Failing?
-                                      │                           │                     │
-                                      │                        (exit 0)              (exit != 0)
-                                      │                           │                     │
-                                      │                           ▼                     ▼
-                                      │                  [ Merge CP Baseline ]    [ Reject with Trace ]
-                                      │                           │
-                                      └── Checkpoints left? ──────┘
+[ 1. Synchronize project-plan.md ] ◄─────────────────────────────────────────────┐
+    │ (Read or create SSOT in project root)                                      │
+    ▼                                                                            │
+[ 2. Scope Classification ]                                                      │
+    ├── Multiple Subsystems ──► [ Epics recorded in project-plan.md ] ──┐        │
+    ├── Atomic Change (1 merge) ──► [ Execute Task directly (exit 0) ]  │        │
+    └── Subsystem with Increments ──────────────────────────────────────┤        │
+                                                                        ▼        │
+                                                      [ 3. Compile Checkpoints ] │
+                                                        (Write CPs to plan)      │
+                                                                        │        │
+                                                                        ▼        │
+                                                   ┌──► [ 4. Set Current Focus ] │
+                                                   │      (Update plan header)   │
+                                                   │                    │        │
+                                                   │                    ▼        │
+                                                   │           [ 5. Topology Gate ]
+                                                   │              ├── <= 3 files ──► [ Single-Agent Monolith ]
+                                                   │              └── Concurrent ──► [ Local Multi-Agent DAG ]
+                                                   │                    │                    │
+                                                   │                    └─────────┬──────────┘
+                                                   │                              ▼
+                                                   │                 [ 6. Execute Implementation ]
+                                                   │                              │
+                                                   │                              ▼
+                                                   │                 [ 7. Enforce Proof Contract ]
+                                                   │                              │
+                                                   │                Passes? ──────┴────── Failing?
+                                                   │                   │                     │
+                                                   │                (exit 0)              (exit != 0)
+                                                   │                   │                     │
+                                                   │                   ▼                     ▼
+                                                   │          [ 8. Post-Sync Plan ]   [ Reject with Trace ]
+                                                   │            - Mark CP [x]
+                                                   │            - Add Completed Log
+                                                   │            - Merge baseline
+                                                   │                   │
+                                                   └── Checkpoints left? ──────┘
 ```
 
 ---
