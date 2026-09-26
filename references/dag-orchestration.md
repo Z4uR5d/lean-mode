@@ -13,7 +13,7 @@ Traditional multi-agent frameworks attempt to plan an entire multi-phase project
 
 ### The Lean Solution
 > [!IMPORTANT]
-> **The Orchestrator constructs an execution DAG strictly for ONE active Checkpoint at a time.** It never plans or executes future Checkpoints concurrently.
+> **The Orchestrator constructs an execution DAG strictly for one active Checkpoint at a time.** It never plans or executes future Checkpoints concurrently.
 
 ---
 

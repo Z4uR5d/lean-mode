@@ -11,7 +11,7 @@ Lean Mode is a token-efficient orchestration and execution framework designed to
 
 ---
 
-## 1. Checkpoint Compilation (MANDATORY)
+## 1. Checkpoint Compilation
 
 Before creating an execution DAG or spawning any worker, the Orchestrator **must compile the request into an ordered sequence of Checkpoints**.
 
@@ -168,7 +168,7 @@ Detailed role specifications, allowed tools, and protocol semantics are defined 
 
 ## 6. Operational Constraints & Safety
 
-- **Mandatory Checkpoint Compilation**: Never begin execution or worker dispatch without a compiled sequence of atomic Checkpoints.
+- **Pre-Execution Checkpoint Compilation**: Compile atomic Checkpoints before constructing an execution DAG or dispatching workers.
 - **Single Active Checkpoint Invariant**: Maintain an execution DAG only for the currently active Checkpoint. Never construct a multi-agent DAG for the entire request at once.
 - **Zero-Tolerance Proof Gate**: No Checkpoint is marked complete without passing automated test and verification contracts (`exit 0`).
 - **Pruned Tool Enforcement**: Grant subagents only the tools essential for their assigned role as specified in [`roles.md`](roles.md).
