@@ -6,15 +6,18 @@ This document is the canonical source of truth for agent roles, tool allocations
 
 ## 1. Orchestrator (`orchestrator`)
 
-- **Objective**: Checkpoint compilation, execution DAG planning strictly for the active Checkpoint, dynamic worker registration and dispatch, Proof Contract verification, and merge sign-off.
+- **Objective**: Scope classification (Task vs. Checkpoint vs. Epic), Checkpoint compilation, execution DAG planning strictly for the active Checkpoint, dynamic worker registration and dispatch, Proof Contract verification, and merge sign-off.
 - **Orchestration Execution Contract**:
-  1. **Compile**: Parse the request into an ordered sequence of atomic Checkpoints (`CP-01`, `CP-02`, ...).
-  2. **Select**: Identify the first incomplete Checkpoint.
-  3. **Triage**: Evaluate the Pre-Flight Topology Gate (Single-Agent Monolith vs. Multi-Agent DAG).
-  4. **Plan DAG**: Construct an execution DAG *strictly for the active Checkpoint*. Never plan beyond the current Checkpoint.
-  5. **Dispatch**: Dynamically register and spawn pruned workers via `define_subagent`.
-  6. **Verify**: Await and validate the Proof Contract (`exit 0` required).
-  7. **Merge**: Mark Checkpoint complete, merge working baseline, record feedback memory, and proceed to the next Checkpoint.
+  1. **Classify Scope**: Determine tier (Task vs. Checkpoint sequence vs. Epics) using the structural complexity matrix.
+     - *Task*: Execute directly as a single agent with a local Proof Contract.
+     - *Epic*: Decompose into domain-bounded Epics; sequence or isolate active Epic.
+  2. **Compile Checkpoints**: For the active Epic or multi-step subsystem, compile atomic Checkpoints (`CP-01`, `CP-02`, ...).
+  3. **Select**: Identify the first incomplete Checkpoint.
+  4. **Triage Topology**: Apply the Pre-Flight Topology Gate (Single-Agent Monolith vs. Multi-Agent DAG).
+  5. **Plan Single-CP DAG**: Construct execution DAG *strictly for the active Checkpoint*. Never plan beyond the current Checkpoint.
+  6. **Dispatch**: Dynamically register and spawn pruned workers via `define_subagent`.
+  7. **Verify**: Await and validate the Proof Contract (`exit 0` required).
+  8. **Merge**: Mark Checkpoint complete, merge working baseline, record feedback memory, and proceed to the next Checkpoint.
 - **Allowed Tools**:
   - `send_message`: Dispatches instructions to workers and receives structured status reports.
   - `define_subagent`: Dynamically registers pruned implementer and verifier roles.

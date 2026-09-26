@@ -20,31 +20,39 @@ Traditional multi-agent frameworks attempt to plan an entire multi-phase project
 ## 2. Orchestration Execution Lifecycle
 
 ```
-[ Compile Checkpoints: CP-01, CP-02, ... CP-N ]
-                     │
-                     ▼
-       ┌──► [ Select Next Incomplete CP ]
-       │             │
-       │             ▼
-       │    [ Evaluate Topology Gate ]
-       │       ├── Touches <= 3 files / Sequential ──► [ Execute Single-Agent Monolith ]
-       │       └── Concurrent Modules / Review Gate ──► [ Plan DAG & Dispatch Workers ]
-       │             │                                           │
-       │             └───────────────────┬───────────────────────┘
-       │                                 ▼
-       │                     [ Execute Implementation ]
-       │                                 │
-       │                                 ▼
-       │                     [ Enforce Proof Contract ]
-       │                                 │
-       │                    Passes? ─────┴───── Failing?
-       │                       │                    │
-       │                    (exit 0)             (exit != 0)
-       │                       │                    │
-       │                       ▼                    ▼
-       │              [ Merge CP Baseline ]    [ Reject to Worker with Trace ]
-       │                       │
-       └── Checkpoints left? ──┘
+[ Request ]
+    │
+    ▼
+[ 1. Scope Classification ]
+    ├── Multiple Subsystems ──► [ Decompose into Epics ] ──┐
+    ├── Atomic Change (1 merge) ──► [ Execute Task directly (exit 0) ]
+    └── Subsystem with Increments ─────────────────────────┤
+                                                           ▼
+                                         [ 2. Compile Checkpoints: CP-01... ]
+                                                           │
+                                                           ▼
+                                      ┌──► [ 3. Select Next Incomplete CP ]
+                                      │                    │
+                                      │                    ▼
+                                      │           [ 4. Topology Gate ]
+                                      │              ├── <= 3 files / Sequential ──► [ Single-Agent Monolith ]
+                                      │              └── Concurrent / Review Gate ─► [ Local Multi-Agent DAG ]
+                                      │                    │                                   │
+                                      │                    └─────────────────┬─────────────────┘
+                                      │                                      ▼
+                                      │                         [ 5. Execute Implementation ]
+                                      │                                      │
+                                      │                                      ▼
+                                      │                         [ 6. Enforce Proof Contract ]
+                                      │                                      │
+                                      │                        Passes? ──────┴────── Failing?
+                                      │                           │                     │
+                                      │                        (exit 0)              (exit != 0)
+                                      │                           │                     │
+                                      │                           ▼                     ▼
+                                      │                  [ Merge CP Baseline ]    [ Reject with Trace ]
+                                      │                           │
+                                      └── Checkpoints left? ──────┘
 ```
 
 ---
